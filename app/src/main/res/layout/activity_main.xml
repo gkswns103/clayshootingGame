@@ -10,14 +10,14 @@
 
     <Button
         android:id="@+id/btnStart"
-        android:text="게임시작"
         android:layout_width="110dp"
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="8dp"
+        android:text="게임시작"
         android:textSize="18sp"
         app:layout_constraintBaseline_toTopOf="@+id/btnStop"
-        app:layout_constraintStart_toEndOf="parent" />
+        app:layout_constraintStart_toEndOf="parent"
+        tools:layout_editor_absoluteY="361dp" />
 
     <Button
         android:id="@+id/btnStop"

@@ -1,14 +1,19 @@
 package com.example.clayshootinggame;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -94,6 +99,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void shootingStart() {
+        iv_bullet.setVisibility(View.VISIBLE);
+
+        ObjectAnimator bullet_SDX = ObjectAnimator.ofFloat(iv_bullet,"scaleX",1f,0f);
+        ObjectAnimator bullet_SDY = ObjectAnimator.ofFloat(iv_bullet,"scaleY",1f,0f);
+        ObjectAnimator bullet_Y = ObjectAnimator.ofFloat(iv_bullet,"translationY",(float)gun_y ,0f);
+
+        double bullet_x = gun_center_x - 0.5 * bullet_width;
+        iv_bullet.setX((float)bullet_x);
+
+        bullet_Y.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                bullet_center_x = iv_bullet.getX() + 0.5f * bullet_width;
+                bullet_center_y = iv_bullet.getY() + 0.5f * bullet_height;
+
+                clay_center_x = iv_clay.getX() + 0.5f * clay_width;
+                clay_center_y = iv_clay.getY() + 0.5f * clay_height;
+
+                double dist = Math.sqrt(Math.pow(bullet_center_x - clay_center_x, 2)+Math.pow(bullet_center_y - clay_center_y, 2));
+                if(dist <= 100)
+                    iv_clay.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        bullet_SDX.start();
+        bullet_SDY.start();
+        bullet_Y.start();
     }
 
     private void gameStop() {
@@ -101,6 +134,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gameStart() {
+        ObjectAnimator clay_translateX = ObjectAnimator.ofFloat(iv_clay, "translationX", -100f, (float)screen_width);
+        ObjectAnimator clay_translateY = ObjectAnimator.ofFloat(iv_clay, "translationY", 0f, 0f );
+        ObjectAnimator clay_rotation = ObjectAnimator.ofFloat(iv_clay, "rotation", 0f, 360f*5f);
+        clay_translateX.setRepeatCount(NO_OF_CLAYS-1);
+        clay_translateY.setRepeatCount(NO_OF_CLAYS-1);
+        clay_rotation.setRepeatCount(NO_OF_CLAYS-1);
+        clay_translateX.setDuration(3000);
+        clay_translateY.setDuration(3000);
+        clay_rotation.setDuration(3000);
+
+        clay_translateX.addListener(new Animator.AnimatorListener() {
+            public void onAnimationStart(Animator animator) {
+                iv_clay.setVisibility(View.VISIBLE);
+            }
+            public void onAnimationEnd(Animator animator) {
+                Toast.makeText(getApplicationContext(), "게임 종료", Toast.LENGTH_SHORT).show();
+            }
+            public void onAnimationCancel(Animator animator) {
+            }
+            public void onAnimationRepeat(Animator animator) {
+                iv_clay.setVisibility(View.VISIBLE);
+            }
+        });
+        clay_translateX.start();
+        clay_translateY.start();
+        clay_rotation.start();
 
     }
 }
